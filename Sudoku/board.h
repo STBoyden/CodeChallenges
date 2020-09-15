@@ -10,6 +10,8 @@ private:
     int size = 0, solved = 0;
 
 public:
+    bool size_toggle = false;
+
     //O(n), collapses to O(1) when solved
     int Front() const
     {
@@ -34,7 +36,7 @@ public:
     }
     void TurnOn(int i)
     {
-        size += !possible[i]; //branchless
+        size += !possible[i]; //possible[i] is 0, toggling adds to size
         possible[i] = 1;
     }
     int Find(int i) const
@@ -52,13 +54,13 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Canidates &c)
     {
-        return os << (c.Size() != 1 ? 0 : c.Front());
+        return os << ((c.Size() != 1 ? 0 : c.Front()) * !c.size_toggle) + (c.Size() * c.size_toggle);
     }
 };
 
 struct SudokuBoard
 {
-    Mat<Canidates> board;
+    Mat<Canidates> board, local;
     std::vector<Point<2, int>> unsolved;
 
     SudokuBoard(const std::vector<int> &boardStart, int dim = 3)
@@ -67,24 +69,35 @@ struct SudokuBoard
             throw std::invalid_argument("board data must be the same as the inputed dimensions");
 
         board = std::move(Mat<Canidates>(dim * 3, dim * 3));
+        local = std::move(Mat<Canidates>(dim, dim));
+
+        const std::vector<int> all{1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+        for (Canidates *pL = local.begin(); pL != local.end(); ++pL)
+        {
+            for (int i = 1; i < 10; ++i)
+            {
+                pL->TurnOn(i);
+                pL->size_toggle = true;
+            }
+        }
 
         //setup board
-        Canidates *p = board.begin();
-        const std::vector<int> all{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Canidates *pB = board.begin();
         for (int i : boardStart)
         {
             if (i) //not zero
             {
-                p->TurnOn(i);
+                pB->TurnOn(i);
             }
             else
             {
                 for (int j = 1; j < 10; ++j)
                 {
-                    p->TurnOn(j);
+                    pB->TurnOn(j);
                 }
             }
-            ++p;
+            ++pB;
         }
 
         //adding all unsolved
