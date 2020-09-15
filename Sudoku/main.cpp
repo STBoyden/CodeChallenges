@@ -43,8 +43,6 @@ inline void TrimCanidates(SudokuBoard &s)
             }
         }
     }
-
-    //trimming individual
     for (const Point<2, int> &p : s.unsolved)
     {
         //checking vertical and horizontal
@@ -108,23 +106,20 @@ int main(int argc, char *argv[])
     //start timer
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
     {
-        while (x) //while not solved
+
+    start:
+        std::cout << gameBoard.board << '\n'
+                  << gameBoard.local << '\n';
+
+        //strats
+        TrimCanidates(gameBoard);
+        if (x != gameBoard.unsolved.size())
         {
-        start:
-            std::cout << gameBoard.board << '\n'
-                      << gameBoard.local << '\n';
-
-            UpdateUnsolved(gameBoard);
-
-            //strats
-            TrimCanidates(gameBoard);
-            if (x != gameBoard.unsolved.size())
-            {
-                x = gameBoard.unsolved.size();
-                goto start;
-            }
-            break;
+            x = gameBoard.unsolved.size();
+            goto start;
         }
+
+        //backtracking
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
