@@ -10,8 +10,6 @@ private:
     int size = 0, solved = 0;
 
 public:
-    bool size_toggle = false;
-
     //O(n), collapses to O(1) when solved
     int Front() const
     {
@@ -52,9 +50,10 @@ public:
         return size;
     }
 
+    bool size_toggle = false;
     friend std::ostream &operator<<(std::ostream &os, const Canidates &c)
     {
-        return os << ((c.Size() != 1 ? 0 : c.Front()) * !c.size_toggle) + (c.Size() * c.size_toggle);
+        return os << ((!(c.Size() != 1) * c.Front()) * !c.size_toggle) + (c.Size() * c.size_toggle);
     }
 };
 
