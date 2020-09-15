@@ -7,25 +7,24 @@ class Canidates
 {
 private:
     std::vector<bool> possible{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //vector to save mem
-    int size = 0, solved = 0;
+    int size = 0;
 
 public:
-    //O(n), collapses to O(1) when solved
+    //O(n)
     int Front() const
     {
-        for (int i = 1 + (9 * solved); i < 10; ++i) // 1+(9*solved) skips if solved already
+        for (int i = 1; i < 10; ++i) // 1+(9*solved) skips if solved already
         {
             if (possible[i]) //maybe will add offset = i; in future
                 return i;    //1-9
         }
-        return solved;
+        return 0;
     }
 
     //all of these functions are O(1)
     void Erase(int i)
     {
-        solved = Front() * (size == 1); //branchless
-        size -= possible[i];            //branchless
+        size -= possible[i]; //branchless
         possible[i] = 0;
     }
     bool Solved() const
