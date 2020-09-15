@@ -36,10 +36,6 @@ public:
         size += !possible[i]; //possible[i] is 0, toggling adds to size
         possible[i] = 1;
     }
-    int Find(int i) const
-    {
-        return possible[i];
-    }
     bool Contains(int i) const
     {
         return possible[i];
@@ -52,7 +48,7 @@ public:
     bool size_toggle = false;
     friend std::ostream &operator<<(std::ostream &os, const Canidates &c)
     {
-        return os << ((!(c.Size() != 1) * c.Front()) * !c.size_toggle) + (c.Size() * c.size_toggle);
+        return os << ((!(c.Size() != 1) * c.Front()) * !c.size_toggle) + (c.Size() * c.size_toggle); //branchless
     }
 };
 
