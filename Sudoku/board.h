@@ -7,34 +7,40 @@ class Canidates
 {
 private:
     std::vector<bool> possible{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //vector to save mem
-    int size = 0;
+    int size = 0, last = 0;
 
 public:
-    //O(n)
-    int Front() const
+    //O(n) funcs
+    int Front()
     {
-        for (int i = 1; i < 10; ++i) // 1+(9*solved) skips if solved already
+        for (int i = 0 + (last * 10); i < 10; ++i)
         {
-            if (possible[i]) //maybe will add offset = i; in future
-                return i;    //1-9
+            if (possible[i])
+            {
+                last = i;
+                return i;
+            }
         }
-        return 0;
+
+        return last;
     }
 
-    //all of these functions are O(1)
+    //O(1) funcs
     void Erase(int i)
     {
         size -= possible[i]; //branchless
         possible[i] = 0;
-    }
-    bool Solved() const
-    {
-        return size == 1;
+        last = 0;
     }
     void TurnOn(int i)
     {
         size += !possible[i]; //possible[i] is 0, toggling adds to size
         possible[i] = 1;
+        last = 0;
+    }
+    bool Solved() const
+    {
+        return size == 1;
     }
     bool Contains(int i) const
     {
@@ -45,8 +51,19 @@ public:
         return size;
     }
 
+    void Reset()
+    {
+        possible = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        size = 0;
+    }
+    void Fill()
+    {
+        possible = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        size = 9;
+    }
+
     bool size_toggle = false;
-    friend std::ostream &operator<<(std::ostream &os, const Canidates &c)
+    friend std::ostream &operator<<(std::ostream &os, Canidates c)
     {
         return os << ((!(c.Size() != 1) * c.Front()) * !c.size_toggle) + (c.Size() * c.size_toggle); //branchless
     }
