@@ -3,28 +3,22 @@
 #include <chrono>
 #include <iomanip>
 #include "board.h"
-#include "tpool.h"
 
-const unsigned int cores = std::thread::hardware_concurrency();
 const std::vector<int> all{1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 inline void UpdateUnsolved(SudokuBoard &s)
 {
-    std::vector<Point<2, int>> res;
-    for (Point<2, int> p : s.unsolved)
+    std::vector<Point<2, uint_fast8_t>> res;
+    for (Point<2, uint_fast8_t> p : s.unsolved)
     {
         if (s.board.At(p[0], p[1]).Size() != 1)
-        {
             res.push_back(p);
-        }
     }
     s.unsolved = std::move(res);
 }
 
 inline void TrimCanidates(SudokuBoard &s)
 {
-    Point<2, int> localPoint;
-
     //triming local
     for (int i = 0; i < s.local.SizeY(); ++i)
     {
@@ -43,7 +37,7 @@ inline void TrimCanidates(SudokuBoard &s)
             }
         }
     }
-    for (const Point<2, int> &p : s.unsolved)
+    for (const Point<2, uint_fast8_t> &p : s.unsolved)
     {
         //checking vertical and horizontal
         for (int i = p[1] - 1; i >= 0; --i) //y1-1 -> 0
@@ -64,6 +58,31 @@ inline void TrimCanidates(SudokuBoard &s)
         }
     }
     UpdateUnsolved(s);
+}
+
+bool BasicBacktrack(const SudokuBoard &b, Mat<Canidates> &res)
+{
+    if (!b.unsolved.size()) // empty
+    {
+        res = std::move(b.board);
+        return true;
+    }
+
+    Point<2, uint_fast8_t> unsolvedP = b.unsolved[0];
+    Canidates index_value = b.board.At(unsolvedP[0], unsolvedP[1]);
+    for (int i = 1; i <= 9; ++i)
+    {
+        if (index_value.Contains(i))
+        {
+            SudokuBoard copyMat = b;
+            copyMat.board.At(unsolvedP[0], unsolvedP[1]).Reset();
+            copyMat.board.At(unsolvedP[0], unsolvedP[1]).TurnOn(i);
+            TrimCanidates(copyMat);
+            if (BasicBacktrack(copyMat, res))
+                return true;
+        }
+    }
+    return false;
 }
 
 int main(int argc, char *argv[])
@@ -91,50 +110,42 @@ int main(int argc, char *argv[])
     //    0, 0, 0,     7, 0, 2,    0, 0, 0,
     //    2, 0, 0,     4, 3, 0,    0, 1, 8});
 
-    SudokuBoard gameBoard({7, 2, 0, 0, 9, 6, 0, 0, 3,
-                           0, 0, 0, 2, 0, 5, 0, 0, 0,
-                           0, 8, 0, 0, 0, 4, 0, 2, 0,
-                           0, 0, 0, 0, 0, 0, 0, 6, 0,
-                           1, 0, 6, 5, 0, 3, 8, 0, 7,
-                           0, 4, 0, 0, 0, 0, 0, 0, 0,
-                           0, 3, 0, 8, 0, 0, 0, 9, 0,
-                           0, 0, 0, 7, 0, 2, 0, 0, 0,
-                           2, 0, 0, 4, 3, 0, 0, 1, 8});
+    SudokuBoard gameBoard({0, 0, 0, 6, 0, 0, 4, 0, 0,
+                           7, 0, 0, 0, 0, 3, 6, 0, 0,
+                           0, 0, 0, 0, 9, 1, 0, 8, 0,
+                           0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           0, 5, 0, 1, 8, 0, 0, 0, 3,
+                           0, 0, 0, 3, 0, 6, 0, 4, 5,
+                           0, 4, 0, 2, 0, 0, 0, 6, 0,
+                           9, 0, 3, 0, 0, 0, 0, 0, 0,
+                           0, 2, 0, 0, 0, 0, 1, 0, 0});
 
     int x = gameBoard.unsolved.size();
+
+    Mat<uint_fast8_t> backTrackBoard(gameBoard.board.SizeX(), gameBoard.board.SizeY());
 
     //start timer
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
     {
-
-    start:
-        std::cout << gameBoard.board << '\n'
-                  << gameBoard.local << '\n';
-
-        //strats
-        TrimCanidates(gameBoard);
-        if (x != gameBoard.unsolved.size())
+        do
         {
             x = gameBoard.unsolved.size();
-            goto start;
-        }
+
+            //strats
+            TrimCanidates(gameBoard);
+
+        } while (x != gameBoard.unsolved.size());
 
         //backtracking
+        BasicBacktrack(gameBoard, gameBoard.board);
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-
     //end timer
-    std::cout << gameBoard.unsolved.size() << '\n';
+
     std::cout << "wowee solved!\n";
     std::cout << std::setprecision(7) << std::fixed << time_span.count() << '\n';
-    std::cout << gameBoard.board << '\n'
-              << gameBoard.local << '\n';
-
-    //function call count
-    // erase - 6412
-    // front - 3622
-    // turnon - 586
+    std::cout << gameBoard.board << '\n';
 
     return 0;
 }
