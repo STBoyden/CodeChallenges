@@ -1,5 +1,5 @@
 #pragma once
-struct
+namespace Constants
 {
     const int BOARD_HEIGHT = 9;
     const int BOARD_WIDTH = 9;
@@ -7,7 +7,7 @@ struct
     const int CLIQUE_WIDTH = 3;
     const int NUM_CLIQUES = (BOARD_HEIGHT * BOARD_WIDTH); // (CLIQUE_HEIGHT * CLIQUE_WIDTH)
 
-    struct
+    namespace Border
     {
         const char DOUBLE_VERTICAL = 186;
         const char DOUBLE_HORIZONTAL = 205;
@@ -22,12 +22,12 @@ struct
         const char SINGLE_VERTICAL = 186;
         const char SINGLE_HORIZONTAL = 205;
         const char SINGLE_CROSS = 206;
-    } Border;
+    }; // namespace Border
 
-    struct
+    namespace Printing
     {
         const float SLEEP_DURATION = 0.001;
         const int BOARD_HEIGHT = 13;
         const int CLIQUE_SIZE = 7;
-    } Printing;
-} Constants;
+    }; // namespace Printing
+};     // namespace Constants
