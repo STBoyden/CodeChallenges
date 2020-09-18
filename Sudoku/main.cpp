@@ -60,7 +60,7 @@ inline void TrimCanidates(SudokuBoard &s)
     UpdateUnsolved(s);
 }
 
-bool BasicBacktrack(const SudokuBoard &b, Mat<Canidates> &res)
+bool BasicBacktrack(SudokuBoard &b, Mat<Canidates> &res)
 {
     if (!b.unsolved.size()) // empty
     {
