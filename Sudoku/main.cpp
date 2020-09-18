@@ -110,15 +110,15 @@ int main(int argc, char *argv[])
     //    0, 0, 0,     7, 0, 2,    0, 0, 0,
     //    2, 0, 0,     4, 3, 0,    0, 1, 8});
 
-    SudokuBoard gameBoard({0, 0, 0, 6, 0, 0, 4, 0, 0,
-                           7, 0, 0, 0, 0, 3, 6, 0, 0,
-                           0, 0, 0, 0, 9, 1, 0, 8, 0,
-                           0, 0, 0, 0, 0, 0, 0, 0, 0,
-                           0, 5, 0, 1, 8, 0, 0, 0, 3,
-                           0, 0, 0, 3, 0, 6, 0, 4, 5,
-                           0, 4, 0, 2, 0, 0, 0, 6, 0,
-                           9, 0, 3, 0, 0, 0, 0, 0, 0,
-                           0, 2, 0, 0, 0, 0, 1, 0, 0});
+    SudokuBoard gameBoard({1, 0, 0, 4, 8, 9, 0, 0, 6,
+                           7, 3, 0, 0, 0, 0, 0, 4, 0,
+                           0, 0, 0, 0, 0, 1, 2, 9, 5,
+                           0, 0, 7, 1, 2, 0, 6, 0, 0,
+                           5, 0, 0, 7, 0, 3, 0, 0, 8,
+                           0, 0, 6, 0, 9, 5, 7, 0, 0,
+                           9, 1, 4, 6, 0, 0, 0, 0, 0,
+                           0, 2, 0, 0, 0, 0, 0, 3, 7,
+                           8, 0, 0, 5, 1, 2, 0, 0, 4});
 
     int x = gameBoard.unsolved.size();
 
@@ -136,8 +136,8 @@ int main(int argc, char *argv[])
 
         } while (x != gameBoard.unsolved.size());
 
-        //backtracking
-        BasicBacktrack(gameBoard, gameBoard.board);
+        if (gameBoard.unsolved.size())
+            BasicBacktrack(gameBoard, gameBoard.board);
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
