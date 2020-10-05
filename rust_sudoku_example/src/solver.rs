@@ -6,12 +6,7 @@ impl Solver {
     pub fn slow_print(board: &Board) {
         thread::sleep(time::Duration::from_secs_f32(printing::SLEEP_DURATION));
 
-        for _ in 0..printing::BOARD_HEIGHT {
-            println!("\x1b[1A");
-            println!("\x1b[2K");
-        }
-
-        println!("{}", board);
+        println!("\n{}", board);
     }
 
     pub fn solve_board(
@@ -23,7 +18,7 @@ impl Solver {
             return Err("Board is initially invalid!".to_string());
         }
 
-        println!("Solving with algorithm: {}", algorithm.get_name());
+        println!("Solving with algorithm: {}\n", algorithm.get_name());
         println!("Board to solve:\n{}\n", board);
 
         if do_slow_print {
