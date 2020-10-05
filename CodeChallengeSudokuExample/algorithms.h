@@ -2,7 +2,12 @@
 #include <chrono>
 #include "board.h"
 
-namespace BasicRecursiveBacktrackAlgorithm
+struct BaseAlgorithm
+{
+    virtual double solve(Board &b) = 0;
+};
+
+struct BasicRecursiveBacktrackAlgorithm : public BaseAlgorithm
 {
     bool basic_recursive_backtrack_solve(Board &b, int editable_index = 0)
     {
@@ -26,7 +31,7 @@ namespace BasicRecursiveBacktrackAlgorithm
         return false;
     }
 
-    inline double solve(Board &b)
+    virtual double solve(Board &b) override
     {
         std::chrono::high_resolution_clock::time_point time_start = std::chrono::high_resolution_clock::now();
         BasicRecursiveBacktrackAlgorithm::basic_recursive_backtrack_solve(b);
