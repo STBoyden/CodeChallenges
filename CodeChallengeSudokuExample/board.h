@@ -1,10 +1,10 @@
 #pragma once
 #include "Constants.h"
-#include "min_mat.h"
-#include "point.h"
+#include "MiscHeaderFiles-master/min_mat.h"
+#include "MiscHeaderFiles-master/point.h"
 #include "helpers.h"
+#include <unordered_set>
 #include <vector>
-#include <set>
 
 struct Board
 {
@@ -121,7 +121,7 @@ struct Board
         if (!is_colum_valid(p[1]))
             return false;
 
-        if (!is_clique_valid(p))
+        if (!is_clique_valid(BoardHelper::get_clique_index_for_coordinates(p[0], p[1])))
             return false;
 
         return true;
@@ -130,72 +130,73 @@ struct Board
     //changed from dict in py to vec in c++... I couldnt help myself, O(1) vs O(log n) and all
     bool is_colum_valid(int x) const
     {
-        std::vector<bool> occurrences_vec{0, 0, 0, 0, 0, 0, 0, 0, 0}; //in py prog this is a dict, which is O(log n), but as vec its just O(1)
-        int square_value = 0;
-        for (int y = 0; y < Constants::BOARD_WIDTH; ++y)
+        std::unordered_set<int> occurrence_dict;
+
+        int square_value;
+        for (int y = 0; y < Constants::BOARD_HEIGHT; ++y)
         {
             square_value = raw_table.At(x, y);
 
             if (!square_value)
                 continue;
 
-            if (occurrences_vec[square_value - 1]) //does it contain
+            if (occurrence_dict.contains(square_value))
             {
                 return false;
             }
             else
             {
-                occurrences_vec[square_value - 1] = true; //now it contains it
+                occurrence_dict.emplace(square_value);
             }
         }
+
         return true;
     }
 
     bool is_row_valid(int y) const
     {
-        std::vector<bool> occurrences_vec{0, 0, 0, 0, 0, 0, 0, 0, 0}; //in py prog this is a dict, which is O(log n), but as vec its just O(1)
-        int square_value = 0;
-        for (int x = 0; x < Constants::BOARD_WIDTH; ++x)
+        std::unordered_set<int> occurrence_dict;
+
+        int square_value;
+        for (int x = 0; x < Constants::BOARD_HEIGHT; ++x)
         {
             square_value = raw_table.At(x, y);
 
             if (!square_value)
                 continue;
 
-            if (occurrences_vec[square_value - 1]) //does it contain
+            if (occurrence_dict.contains(square_value))
             {
                 return false;
             }
             else
             {
-                occurrences_vec[square_value - 1] = true; //now it contains it
+                occurrence_dict.emplace(square_value);
             }
         }
+
         return true;
     }
 
-    bool is_clique_valid(const Point<2, int> &cliqueStart) const
+    bool is_clique_valid(int clique_index) const
     {
-        std::vector<bool> occurrences_vec{0, 0, 0, 0, 0, 0, 0, 0, 0}; //in py prog this is a dict, which is O(log n), but as vec its just O(1)
+        std::unordered_set<int> occurrence_dict;
+
         int square_value;
-        Point<2, int> local = BoardHelper::GetLocal(cliqueStart);
-
-        for (int y = 0; y < Constants::CLIQUE_HEIGHT; ++y)
+        for (Point<2, int> e : BoardHelper::cliques.at(clique_index))
         {
-            for (int x = 0; x < Constants::CLIQUE_WIDTH; ++x)
-            {
-                square_value = raw_table.At(local[0] + x, local[1] + y);
-                if (!square_value)
-                    continue;
+            square_value = raw_table.At(e[0], e[1]);
 
-                if (occurrences_vec[square_value - 1])
-                {
-                    return false;
-                }
-                else
-                {
-                    occurrences_vec[square_value - 1] = true;
-                }
+            if (!square_value)
+                continue;
+
+            if (occurrence_dict.contains(square_value))
+            {
+                return false;
+            }
+            else
+            {
+                occurrence_dict.emplace(square_value);
             }
         }
 
@@ -213,13 +214,11 @@ struct Board
             if (!is_row_valid(x))
                 return false;
         }
-        for (int i = 0; i < Constants::BOARD_HEIGHT; i += 3)
+
+        for (int j = 0; j < Constants::NUM_CLIQUES; ++j)
         {
-            for (int j = 0; j < Constants::BOARD_WIDTH; j += 3)
-            {
-                if (!is_clique_valid(Point<2, int>{j, i}))
-                    return false;
-            }
+            if (!is_clique_valid(j))
+                return false;
         }
 
         return true;
