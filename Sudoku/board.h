@@ -11,6 +11,7 @@ private:
 
 public:
     //O(n) funcs, becomes 26x faster after one run because it becomes O(1)
+    //any Erase or TurnOn calls allows the possibility to change what front returns, so they reset last to 0
     int Front()
     {
         for (int i = (last * 10); i < 10; ++i)
@@ -34,7 +35,7 @@ public:
     }
     void TurnOn(int i)
     {
-        size += !possible[i]; //possible[i] is 0, toggling adds to size
+        size += !possible[i]; //branchless
         possible[i] = 1;
         last = 0;
     }
