@@ -1,22 +1,29 @@
 #pragma once
 #include <vector>
-#include <map>
-#include "point.h"
+#include <unordered_map>
+#include "MiscHeaderFiles-master/point.h"
 #include "constants.h"
 
-//this entire thing makes me wanna die but I did it this way as to best mirror the py equivelant
 namespace BoardHelper
 {
-    inline Point<2, int> GetLocal(const Point<2, int> &p)
+    static std::unordered_map<size_t, std::vector<Point<2, int>>> cliques;
+
+    static int get_clique_index_for_coordinates(int x, int y) { return y + (x / Constants::CLIQUE_WIDTH); }
+
+    static void gen_cords()
     {
-        Point<2, int> res{p[0], p[1]};
+        size_t clique_index = 0;
+        for (int y = 0; y < Constants::BOARD_HEIGHT; ++y)
+        {
+            for (int x = 0; x < Constants::BOARD_WIDTH; ++x)
+            {
+                clique_index = BoardHelper::get_clique_index_for_coordinates(x, y);
+                if (!BoardHelper::cliques.contains(clique_index))
+                    BoardHelper::cliques.insert({clique_index, {}});
 
-        res[0] -= 2 * ((res[0] + 1) % 3 == 0);
-        res[0] -= (res[0] + 2) % 3 == 0;
-
-        res[1] -= 2 * ((res[1] + 1) % 3 == 0);
-        res[1] -= (res[1] + 2) % 3 == 0;
-
-        return res;
+                BoardHelper::cliques.at(clique_index).emplace_back(Point<2, int>{x, y});
+            }
+        }
     }
+
 }; // namespace BoardHelper
