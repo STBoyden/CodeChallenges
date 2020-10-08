@@ -70,7 +70,7 @@ impl BaseAlgorithm for BasicRecursiveBacktrackAlgorithm {
 
         let start = SystemTime::now();
         let result = self.basic_recursive_backtrack_solve(board, print_func, None);
-        let elapsed = start.elapsed().unwrap().as_millis();
+        let elapsed = start.elapsed().unwrap();
 
         return Statistics::new(result, self.num_assignments, elapsed);
     }

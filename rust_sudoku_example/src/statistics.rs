@@ -1,13 +1,13 @@
-use std::fmt;
+use std::{fmt, time::Duration};
 
 pub struct Statistics {
     pub is_solved: bool,
     pub num_assignments: i32,
-    pub time_elapsed: u128,
+    pub time_elapsed: Duration,
 }
 
 impl Statistics {
-    pub fn new(is_solved: bool, num_assignments: i32, time_elapsed: u128) -> Self {
+    pub fn new(is_solved: bool, num_assignments: i32, time_elapsed: Duration) -> Self {
         Self {
             is_solved,
             num_assignments,
@@ -22,8 +22,10 @@ impl fmt::Display for Statistics {
             format!(
                 "Solved: {}
 Assignments: {}
-Time elapsed: {}ms",
-                self.is_solved, self.num_assignments, self.time_elapsed
+Time elapsed: {}s",
+                self.is_solved,
+                self.num_assignments,
+                self.time_elapsed.as_secs_f64()
             )
             .as_str(),
         );
